@@ -25,9 +25,8 @@ class ProductManager {
       };
       this.id++;
       await fs.promises.writeFile(`${this.idFile}`, JSON.stringify(this.id));
-      let products;
+      let products = [];
       if (fs.existsSync(`${this.path}`)) {
-        console.log ("punto 1");
         products = await this.getProducts();
       } else {
         products = [];
@@ -46,11 +45,10 @@ class ProductManager {
     try {
       let data;
       if (fs.existsSync(`${this.path}`))  {
-        return await fs.promises.readFile(`${this.path}`, "utf-8");
+        data = await fs.promises.readFile(`${this.path}`, "utf-8");
       } else {
         return [];
       }  
-      
       const object = JSON.parse(data);
       return object;
     } catch (error) {
