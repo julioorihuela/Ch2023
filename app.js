@@ -32,9 +32,7 @@ class ProductManager {
         products = [];
       }
       products.push(product);
-      await fs.promises.writeFile(
-        `${this.path}`,
-        JSON.stringify(products, null, 2)
+      await fs.promises.writeFile(`${this.path}`, JSON.stringify(products, null, 2)
       );
     } catch (error) {
       console.error(error);
@@ -56,6 +54,41 @@ class ProductManager {
       return [];
     }
   }
+
+  async getProductById(productId) {
+    try {
+      const products = await this.getProducts();
+      return products.find(product => product.id === productId);
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  async updateProduct(id, updates) {
+    try {
+      const products = await this.getProducts();
+      const updatedProducts = products.map((product) => {
+        if (product.id === id) {
+          return { ...product, ...updates };
+        }
+        return product;
+      });
+      await fs.promises.writeFile(`${this.path}`, JSON.stringify(updatedProducts, null, 2));
+    } catch (error) {
+      console.error(error);
+    }
+  }
+  
+  async deleteProduct(productId) {
+    try {
+      const products = await this.getProducts();
+      const updatedProducts = products.filter((product) => product.id !== productId);
+      await fs.promises.writeFile(`${this.path}`, JSON.stringify(updatedProducts, null, 2));
+    } catch (error) {
+      console.error(error);
+    }
+  }  
+
 }
 
 async function main() {
@@ -71,6 +104,17 @@ async function main() {
   );
 
   console.log(await manager.getProducts());
+
+  console.log("Producto 1:")
+  console.log(await manager.getProductById(1));
+
+  await manager.updateProduct(1, { title: "Updated product", price: 999 });
+  console.log("Producto 1 luego del update:")
+  console.log(await manager.getProductById(1));
+
+  await manager.deleteProduct(1);
 }
 
 main();
+
+// module.exports = new ProductManager();
